@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Search, SlidersHorizontal, Star } from "lucide-react";
 import { categoryCatalog, getCategoryBySlug } from "@/lib/category-catalog";
 import { filterProducts } from "@/lib/product-catalog";
+import { AddToCartButton } from "@/components/add-to-cart-button";
 
 type SearchParamsShape = Promise<{
   category?: string;
@@ -197,15 +198,20 @@ export async function ProductCatalog({
                   key={product.id}
                   className="overflow-hidden rounded-[1.8rem] border border-[#d7ddca] bg-white p-4 shadow-[0_18px_50px_-42px_rgba(31,41,18,0.45)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_70px_-44px_rgba(31,41,18,0.48)]"
                 >
-                  <div className={`relative min-h-[220px] overflow-hidden rounded-[1.4rem] ${product.bgClassName}`}>
-                    <Image
-                      src={product.imageSrc}
-                      alt={product.imageAlt}
-                      fill
-                      sizes="(max-width: 640px) 100vw, 220px"
-                      className="object-contain p-5"
-                    />
-                  </div>
+                  <Link
+                    href={`/products/${product.id}`}
+                    className="block rounded-[1.4rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#93a374]"
+                  >
+                    <div className={`relative min-h-[220px] overflow-hidden rounded-[1.4rem] ${product.bgClassName}`}>
+                      <Image
+                        src={product.imageSrc}
+                        alt={product.imageAlt}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 220px"
+                        className="object-contain p-5"
+                      />
+                    </div>
+                  </Link>
 
                   <div className="mt-4">
                     <div className="flex flex-wrap items-center gap-2">
@@ -218,7 +224,9 @@ export async function ProductCatalog({
                     </div>
 
                     <h3 className="mt-3 text-xl font-black tracking-tight text-[#1b2112]">
-                      {product.name}
+                      <Link href={`/products/${product.id}`} className="transition hover:text-[#30411a]">
+                        {product.name}
+                      </Link>
                     </h3>
                     <p className="mt-2 text-sm font-semibold text-[#667256]">{product.brand}</p>
 
@@ -237,13 +245,25 @@ export async function ProductCatalog({
                       <p className="text-3xl font-black tracking-tight text-[#1a2011]">
                         {product.priceLabel}
                       </p>
-                      <p className="mt-1 text-sm text-[#5d6750]">Marketplace value pick</p>
-                      <Link
-                        href={`/categories/${product.categorySlug}`}
-                        className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#2f3b1d] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#243015]"
-                      >
-                        View category details
-                      </Link>
+                      <p className="mt-1 text-sm text-[#5d6750]">{product.savingsLabel}</p>
+                      <div className="mt-4 grid gap-2">
+                        <Link
+                          href={`/products/${product.id}`}
+                          className="inline-flex w-full items-center justify-center rounded-full bg-[#2f3b1d] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#243015]"
+                        >
+                          View full details
+                        </Link>
+                        <AddToCartButton
+                          product={product}
+                          className="inline-flex w-full items-center justify-center rounded-full border border-[#cad2bb] px-5 py-3 text-sm font-semibold text-[#263118] transition hover:bg-[#f5f8ef] disabled:cursor-not-allowed disabled:opacity-70"
+                        />
+                        <Link
+                          href={`/categories/${product.categorySlug}`}
+                          className="inline-flex w-full items-center justify-center rounded-full border border-[#e0e6d5] px-5 py-3 text-sm font-semibold text-[#586349] transition hover:bg-[#fafcf7]"
+                        >
+                          Explore category
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </article>

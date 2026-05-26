@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { CartProvider } from "@/components/cart-provider";
 
 export default function GuestLayout({
   children,
@@ -7,10 +8,10 @@ export default function GuestLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <CartProvider>
       <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />
-    </>
+    </CartProvider>
   );
 }

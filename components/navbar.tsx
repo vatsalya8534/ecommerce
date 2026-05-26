@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Search, ShoppingCart, Menu, X, ChevronDown, User } from 'lucide-react';
+import { useCart } from '@/components/use-cart';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { itemCount } = useCart();
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
@@ -97,9 +99,11 @@ export function Navbar() {
               className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 transform hover:scale-110"
             >
               <ShoppingCart className="w-6 h-6" />
-              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-600 transition-colors duration-200">
-                0
-              </span>
+              {itemCount > 0 ? (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full min-w-5 h-5 px-1 flex items-center justify-center hover:bg-red-600 transition-colors duration-200">
+                  {itemCount > 99 ? "99+" : itemCount}
+                </span>
+              ) : null}
             </Link>
 
             {/* Account/User Icon */}

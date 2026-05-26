@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import type { CategoryEntry } from "@/lib/category-catalog";
 import { ProductCatalog } from "@/components/product-catalog";
 
