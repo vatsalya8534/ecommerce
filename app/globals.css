@@ -128,3 +128,87 @@
     @apply font-sans;
   }
 }
+
+@layer utilities {
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes orb-pulse {
+    0%,
+    100% {
+      transform: scale(1) rotate(0deg);
+      filter: saturate(1);
+    }
+    50% {
+      transform: scale(1.06) rotate(-2deg);
+      filter: saturate(1.15);
+    }
+  }
+
+  @keyframes visual-float {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-8px) scale(1.01);
+    }
+  }
+
+  @keyframes progress-fill {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.7s ease-out both;
+  }
+
+  .animate-fade-up-delay {
+    animation: fade-up 0.7s ease-out 0.12s both;
+  }
+
+  .animate-fade-up-delay-2 {
+    animation: fade-up 0.7s ease-out 0.24s both;
+  }
+
+  .animate-fade-up-delay-3 {
+    animation: fade-up 0.7s ease-out 0.36s both;
+  }
+
+  .animate-fade-up-delay-4 {
+    animation: fade-up 0.7s ease-out 0.48s both;
+  }
+
+  .hero-orb {
+    animation: orb-pulse 4.8s ease-in-out infinite;
+  }
+
+  .hero-orb-delay {
+    animation-delay: 0.6s;
+  }
+
+  .hero-orb-delay-2 {
+    animation-delay: 1.2s;
+  }
+
+  .carousel-visual {
+    animation: visual-float 6s ease-in-out infinite;
+  }
+
+  .hero-progress-bar {
+    animation: progress-fill var(--hero-progress-duration, 5500ms) linear forwards;
+  }
+}
