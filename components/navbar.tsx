@@ -2,7 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Search, ShoppingCart, Menu, X, ChevronDown, LogIn } from 'lucide-react';
+import {
+  Search,
+  ShoppingCart,
+  Menu,
+  X,
+  ChevronDown,
+  LogIn,
+  Package,
+  UserRound,
+} from 'lucide-react';
 import { useCart } from '@/components/use-cart';
 
 export function Navbar() {
@@ -20,6 +29,12 @@ export function Navbar() {
     { href: '/categories', label: 'Categories' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
+  ];
+
+  const accountLinks = [
+    { href: '/account/profile', label: 'My Profile', icon: UserRound },
+    { href: '/account/orders', label: 'Orders', icon: Package },
+    { href: '/login', label: 'Login', icon: LogIn },
   ];
 
   return (
@@ -107,14 +122,45 @@ export function Navbar() {
               ) : null}
             </Link>
 
-            {/* Login Action */}
-            <Link
-              href={loginHref}
-              className="hidden sm:inline-flex items-center gap-2 rounded-full border border-[#cad2bb] px-4 py-2 text-sm font-semibold text-[#263118] transition hover:bg-[#f5f8ef] hover:text-[#223013]"
-            >
-              <LogIn className="h-4 w-4" />
-              Login
-            </Link>
+            <div className="relative hidden sm:block group">
+              <Link
+                href="/account/profile"
+                className="inline-flex items-center gap-2 rounded-full border border-[#cad2bb] bg-white px-4 py-2 text-sm font-semibold text-[#263118] transition hover:bg-[#f5f8ef] hover:text-[#223013]"
+              >
+                <UserRound className="h-4 w-4" />
+                Account
+                <ChevronDown className="h-4 w-4" />
+              </Link>
+
+              <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-[#dde5d1] bg-white p-2 opacity-0 invisible shadow-[0_25px_60px_-30px_rgba(35,45,24,0.35)] transition-all duration-200 group-hover:visible group-hover:opacity-100">
+                <div className="rounded-[1.25rem] bg-[linear-gradient(135deg,#fdfcf6_0%,#edf4e6_100%)] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#738160]">
+                    Signed in as demo user
+                  </p>
+                  <p className="mt-2 text-sm font-bold text-[#1f2a13]">
+                    Aarav Sharma
+                  </p>
+                </div>
+                <div className="mt-2 space-y-1">
+                  {accountLinks.map((link) => {
+                    const Icon = link.icon;
+
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-[#314025] transition hover:bg-[#f5f8ef] hover:text-[#223013]"
+                      >
+                        <span className="rounded-full bg-[#eef3e5] p-2 text-[#455536]">
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        {link.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
 
             {/* Mobile Menu Button */}
             <button
@@ -145,6 +191,20 @@ export function Navbar() {
 
             {/* Mobile Links */}
             <div className="space-y-2">
+              <Link
+                href="/account/profile"
+                className="block rounded-md border border-[#d9e2cd] bg-[#f8fbf4] px-3 py-2 text-center text-sm font-semibold text-[#243015] transition hover:bg-[#eef5e5]"
+                onClick={() => setIsOpen(false)}
+              >
+                My Profile
+              </Link>
+              <Link
+                href="/account/orders"
+                className="block rounded-md border border-[#d9e2cd] bg-[#f8fbf4] px-3 py-2 text-center text-sm font-semibold text-[#243015] transition hover:bg-[#eef5e5]"
+                onClick={() => setIsOpen(false)}
+              >
+                Track Orders
+              </Link>
               <Link
                 href={loginHref}
                 className="block rounded-md bg-[#2f3b1d] px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-[#243015]"
