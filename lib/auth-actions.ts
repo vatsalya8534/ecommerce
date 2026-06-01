@@ -10,6 +10,11 @@ import {
   setSessionCookie,
   verifyPassword,
 } from "@/lib/auth"
+import {
+  bootstrapInitialAdminForUser,
+  getFirstAccessibleAdminPath,
+  getUserAccessContext,
+} from "@/lib/rbac"
 
 export type AuthActionState = {
   error?: string
@@ -40,6 +45,8 @@ export async function signInAction(
     return { error: "Invalid email or password." }
   }
 
+  await bootstrapInitialAdminForUser(user.id)
+
   const token = await createSessionForUser(user.id)
 
   await prisma.user.update({
@@ -52,7 +59,9 @@ export async function signInAction(
   })
 
   await setSessionCookie(token)
-  redirect("/")
+
+  const accessContext = await getUserAccessContext(user.id)
+  redirect(accessContext ? getFirstAccessibleAdminPath(accessContext.permissions) : "/")
 }
 
 export async function signUpAction(

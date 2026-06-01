@@ -18,8 +18,10 @@ model User {
   email        String    @unique
   passwordHash String
   lastLoginAt  DateTime?
+  roleId       String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  role         Role?     @relation(fields: [roleId], references: [id], onDelete: SetNull)
   sessions     Session[]
 }
 
@@ -30,4 +32,43 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+model Module {
+  id              String                 @id @default(cuid())
+  key             String                 @unique
+  name            String
+  path            String?
+  description     String?
+  groupName       String                 @default("Management")
+  sortOrder       Int                    @default(0)
+  isSystem        Boolean                @default(false)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  rolePermissions RoleModulePermission[]
+}
+
+model Role {
+  id                String                 @id @default(cuid())
+  name              String                 @unique
+  description       String?
+  isSystem          Boolean                @default(false)
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  users             User[]
+  modulePermissions RoleModulePermission[]
+}
+
+model RoleModulePermission {
+  id        String   @id @default(cuid())
+  roleId    String
+  moduleId  String
+  canView   Boolean  @default(false)
+  canAction Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, moduleId])
 }

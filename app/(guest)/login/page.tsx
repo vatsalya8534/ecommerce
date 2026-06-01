@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 
 import { LoginPage } from "@/components/login-page"
 import { getCurrentUser } from "@/lib/auth"
+import { getFirstAccessibleAdminPath, getUserAccessContext } from "@/lib/rbac"
 
 export default async function LoginRoutePage({
   searchParams,
@@ -14,7 +15,8 @@ export default async function LoginRoutePage({
   const user = await getCurrentUser()
 
   if (user) {
-    redirect("/")
+    const accessContext = await getUserAccessContext(user.id)
+    redirect(accessContext ? getFirstAccessibleAdminPath(accessContext.permissions) : "/")
   }
 
   const params = await searchParams

@@ -1,32 +1,20 @@
-import { Button } from "@/components/ui/button";
+import EmployeeProfileDataTable from "./order-data-table"
 
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import EmployeeProfileDataTable from "./order-data-table";
+import { hasModulePermission, requireModulePermission } from "@/lib/rbac"
 
 const EmployeeProfilePage = async () => {
-  const route = "/employee-profiles";
-  const permissions = {
-    canView: true,
-    canCreate: true,
-    canEdit: true,
-    canDelete: true,
-  };
-
-  if (!permissions.canView) {
-    redirect("/404");
-  }
-
-  const records : any = []
+  const accessContext = await requireModulePermission("orders", "view")
+  const canManage = hasModulePermission(accessContext.permissions, "orders", "action")
+  const records: never[] = []
 
   return (
     <EmployeeProfileDataTable
       data={records}
-      canEdit={permissions.canEdit}
-      canDelete={permissions.canDelete}
+      canEdit={canManage}
+      canDelete={canManage}
       title="Order"
     />
-  );
-};
+  )
+}
 
-export default EmployeeProfilePage;
+export default EmployeeProfilePage

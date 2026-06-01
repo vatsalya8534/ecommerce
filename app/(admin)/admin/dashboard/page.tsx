@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { requireModulePermission } from "@/lib/rbac"
 
 import {
   ArrowRightIcon,
@@ -123,7 +124,9 @@ function statusClasses(status: string) {
   return "bg-slate-900/10 text-slate-600"
 }
 
-export default function Page() {
+export default async function Page() {
+  await requireModulePermission("dashboard", "view")
+
   return (
     <div className="flex flex-1 flex-col gap-6">
       <section className="relative overflow-hidden rounded-[32px] border border-white/45 bg-white/55 p-6 shadow-[0_32px_90px_-50px_rgba(15,23,42,0.9)] backdrop-blur-2xl md:p-8">

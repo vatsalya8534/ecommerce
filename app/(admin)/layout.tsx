@@ -1,19 +1,31 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { NotificationDropdown } from "@/components/notification-dropdown";
-import { ProfileDropdown } from "@/components/profile-dropdown";
+import { redirect } from "next/navigation"
 
-export default function AdminLayout({
+import { AppSidebar } from "@/components/app-sidebar"
+import { NotificationDropdown } from "@/components/notification-dropdown"
+import { ProfileDropdown } from "@/components/profile-dropdown"
+import { Separator } from "@/components/ui/separator"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { getCurrentAdminAccessContext } from "@/lib/rbac"
+
+export default async function AdminLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
+  const accessContext = await getCurrentAdminAccessContext()
+
+  if (!accessContext) {
+    redirect("/login")
+  }
+
+  if (!accessContext.permissions.some((permission) => permission.canView && permission.path)) {
+    redirect("/")
+  }
+
   return (
-    <>
-      <TooltipProvider>
-        <SidebarProvider>
+    <TooltipProvider>
+      <SidebarProvider>
         <div
           className="flex min-h-svh w-full bg-[radial-gradient(circle_at_top_left,rgba(186,230,253,0.95),transparent_28%),radial-gradient(circle_at_top_right,rgba(153,246,228,0.8),transparent_26%),linear-gradient(180deg,#f6fbff_0%,#eef7f6_52%,#f8fbfd_100%)]"
           style={
@@ -42,7 +54,8 @@ export default function AdminLayout({
             } as React.CSSProperties
           }
         >
-          <AppSidebar />
+          <AppSidebar permissions={accessContext.permissions} />
+
           <SidebarInset className="bg-transparent">
             <header className="sticky top-0 z-50 px-4 pt-4 md:px-6">
               <div className="flex h-[4.5rem] items-center justify-between gap-4 rounded-[28px] border border-white/40 bg-white/55 px-4 shadow-[0_24px_70px_-46px_rgba(15,23,42,0.9)] backdrop-blur-2xl transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-16">
@@ -50,7 +63,7 @@ export default function AdminLayout({
                   <SidebarTrigger className="-ml-1 rounded-full border border-white/50 bg-white/70 text-slate-700 hover:bg-white hover:text-slate-950" />
                   <Separator
                     orientation="vertical"
-                  className="mr-1 hidden data-vertical:h-5 data-vertical:self-auto sm:block"
+                    className="mr-1 hidden data-vertical:h-5 data-vertical:self-auto sm:block"
                   />
                   <div>
                     <p className="text-xs font-medium uppercase tracking-[0.22em] text-slate-400">
@@ -61,22 +74,26 @@ export default function AdminLayout({
                     </h1>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2">
-                  <div className="hidden rounded-full border border-emerald-200/80 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-700 md:block">
-                    Operations healthy
-                  </div>
+                    {/* <div className="hidden rounded-full border border-emerald-200/80 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-700 md:block">
+                      Operations healthy
+                    </div> */}
                   <NotificationDropdown />
-                  <ProfileDropdown />
+                  <ProfileDropdown
+                    user={accessContext.user}
+                    roleName={accessContext.role?.name}
+                  />
                 </div>
               </div>
             </header>
+
             <div className="flex flex-1 flex-col gap-6 p-4 pt-6 md:px-6 md:pb-6">
               {children}
             </div>
           </SidebarInset>
         </div>
-        </SidebarProvider>
-      </TooltipProvider>
-    </>
+      </SidebarProvider>
+    </TooltipProvider>
   )
 }
