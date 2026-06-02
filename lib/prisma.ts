@@ -20,22 +20,28 @@ function createPrismaClient() {
   })
 }
 
-function hasRbacDelegates(client: PrismaClient) {
+function hasExpectedDelegates(client: PrismaClient) {
   const prismaWithDelegates = client as PrismaClient & {
+    category?: unknown
     module?: unknown
+    product?: unknown
+    productImage?: unknown
     role?: unknown
     roleModulePermission?: unknown
   }
 
   return Boolean(
-    prismaWithDelegates.module &&
+    prismaWithDelegates.category &&
+      prismaWithDelegates.module &&
+      prismaWithDelegates.product &&
+      prismaWithDelegates.productImage &&
       prismaWithDelegates.role &&
       prismaWithDelegates.roleModulePermission
   )
 }
 
 export const prisma = hasDatabaseUrl
-  ? globalForPrisma.prisma && hasRbacDelegates(globalForPrisma.prisma)
+  ? globalForPrisma.prisma && hasExpectedDelegates(globalForPrisma.prisma)
     ? globalForPrisma.prisma
     : createPrismaClient()
   : null

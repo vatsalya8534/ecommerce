@@ -72,3 +72,52 @@ model RoleModulePermission {
 
   @@unique([roleId, moduleId])
 }
+
+model Category {
+  id               String    @id @default(cuid())
+  slug             String    @unique
+  name             String
+  tagline          String?
+  description      String?
+  heroTitle        String?
+  heroBody         String?
+  imageSrc         String    @default("/hero-home.svg")
+  imageAlt         String?
+  accentClassName  String?
+  surfaceClassName String?
+  chipLabel        String?
+  stats            String[]  @default([])
+  highlights       String[]  @default([])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  products         Product[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  categoryId  String
+  name        String
+  price       Float
+  imageSrc    String   @default("/hero-home.svg")
+  imageAlt    String?
+  blurb       String?
+  description String?
+  badge       String?
+  bgClassName String?
+  stockStatus String   @default("In stock")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  images      ProductImage[]
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  filename  String
+  mimeType  String
+  data      Bytes
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
