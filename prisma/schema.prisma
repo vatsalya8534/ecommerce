@@ -94,21 +94,46 @@ model Category {
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  categoryId  String
-  name        String
-  price       Float
-  imageSrc    String   @default("/hero-home.svg")
-  imageAlt    String?
-  blurb       String?
-  description String?
-  badge       String?
-  bgClassName String?
-  stockStatus String   @default("In stock")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  images      ProductImage[]
+  id                String   @id @default(cuid())
+  categoryId        String
+  name              String
+  slug              String?  @unique
+  sku               String?  @unique
+  brand             String?
+  sellerName        String?
+  price             Float
+  compareAtPrice    Float?
+  taxRate           Float?
+  stockQuantity     Int      @default(0)
+  minOrderQuantity  Int      @default(1)
+  maxOrderQuantity  Int?
+  weight            Float?
+  dimensions        String?
+  barcode           String?
+  imageSrc          String   @default("/hero-home.svg")
+  imageAlt          String?
+  blurb             String?
+  description       String?
+  seoTitle          String?
+  seoDescription    String?
+  badge             String?
+  bgClassName       String?
+  stockStatus       String   @default("In stock")
+  isFeatured        Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  colorOptions      String[] @default([])
+  sizeOptions       String[] @default([])
+  materials         String[] @default([])
+  tags              String[] @default([])
+  highlights        String[] @default([])
+  specifications    String[] @default([])
+  shippingDetails   String?
+  careInstructions  String?
+  warranty          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  category          Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  images            ProductImage[]
 }
 
 model ProductImage {

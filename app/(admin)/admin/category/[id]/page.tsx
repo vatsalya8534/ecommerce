@@ -6,5 +6,5 @@ export default async function CategoryDetailRedirect({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  redirect(`/admin/category?edit=${id}`)
+  redirect(`/admin/category/new?edit=${id}`)
 }

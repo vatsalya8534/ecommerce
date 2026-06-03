@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { BadgeCheckIcon, UsersIcon, ShieldCheckIcon, Layers3Icon } from "lucide-react"
 
 import {
   assignUserRoleAction,
@@ -89,30 +90,36 @@ export default async function UserAccessPage({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">User access</p>
-            <h2 className="mt-1 text-2xl font-semibold text-slate-950">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
               Assign roles and review who can reach the admin modules.
             </h2>
-            {/* <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-              This page is the last step in the RBAC flow. Modules define what exists,
-              roles define the permission bundle, and each user gets the role you assign here.
-            </p> */}
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
+              This page is the last step in the RBAC flow. Modules define what exists, roles define
+              the permission bundle, and each user gets the role you assign here.
+            </p>
           </div>
 
-          <div className="flex gap-3">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <StatChip icon={UsersIcon} label="Total users" value={String(users.length)} />
+            <StatChip icon={BadgeCheckIcon} label="Users with roles" value={String(assignedCount)} />
+            <StatChip icon={Layers3Icon} label="Available roles" value={String(roles.length)} />
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-3">
             <Link
               href="/admin/user/roles"
-              className="rounded-full border border-white/65 bg-white/70 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-white"
+              className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white/75 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-white"
             >
               Manage roles
             </Link>
             <Link
               href="/admin/user/modules"
-              className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+              className="inline-flex items-center justify-center rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
             >
               Manage modules
             </Link>
           </div>
-        </div>
       </section>
 
       {feedbackMessage ? (
@@ -127,17 +134,11 @@ export default async function UserAccessPage({
         </section>
       ) : null}
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <MetricCard label="Total users" value={String(users.length)} />
-        <MetricCard label="Users with roles" value={String(assignedCount)} />
-        <MetricCard label="Available roles" value={String(roles.length)} />
-      </section>
-
       {canManage ? (
-        <section className="rounded-[30px] border border-white/45 bg-white/55 p-5 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
-          <div className="flex flex-col gap-2">
-            <h3 className="text-xl font-semibold text-slate-950">Create user</h3>
-            <p className="text-sm text-slate-500">
+        <section className="rounded-[32px] border border-white/50 bg-white/60 p-5 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
+          <div className="flex flex-col gap-2 border-b border-slate-100 pb-5">
+            <h3 className="text-xl font-semibold tracking-tight text-slate-950">Create user</h3>
+            <p className="max-w-2xl text-sm leading-6 text-slate-500">
               Add a new user account and optionally assign a role immediately.
             </p>
           </div>
@@ -193,7 +194,7 @@ export default async function UserAccessPage({
             <div className="md:col-span-2 xl:col-span-4">
               <button
                 type="submit"
-                className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
               >
                 Create user
               </button>
@@ -202,10 +203,10 @@ export default async function UserAccessPage({
         </section>
       ) : null}
 
-      <section className="overflow-hidden rounded-[30px] border border-white/45 bg-white/55 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
-        <div className="border-b border-white/40 px-5 py-5">
-          <h3 className="text-xl font-semibold text-slate-950">User role assignments</h3>
-          <p className="mt-1 text-sm text-slate-500">
+      <section className="overflow-hidden rounded-[32px] border border-white/50 bg-white/60 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
+        <div className="border-b border-slate-100 px-5 py-5">
+          <h3 className="text-xl font-semibold tracking-tight text-slate-950">User role assignments</h3>
+          <p className="mt-1 text-sm leading-6 text-slate-500">
             {canManage
               ? "Update a user role and save to refresh their admin access."
               : "You can review assignments, but your role does not include user access changes."}
@@ -213,8 +214,8 @@ export default async function UserAccessPage({
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-white/30 text-left">
-            <thead className="bg-white/35 text-xs uppercase tracking-[0.18em] text-slate-400">
+          <table className="min-w-full divide-y divide-slate-100 text-left">
+            <thead className="bg-[#0ea5e9] text-xs uppercase tracking-[0.18em] text-white">
               <tr>
                 <th className="px-5 py-3 font-medium">User</th>
                 <th className="px-5 py-3 font-medium">Current role</th>
@@ -223,9 +224,9 @@ export default async function UserAccessPage({
                 <th className="px-5 py-3 font-medium">Assignment</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/20">
-              {users.map((user) => (
-                <tr key={user.id} className="align-top text-sm text-slate-700">
+            <tbody className="divide-y divide-slate-100">
+              {users.map((user, index) => (
+                <tr key={user.id} className={`align-top text-sm text-slate-700 ${index % 2 === 0 ? "bg-white" : "bg-slate-50/40"}`}>
                   <td className="px-5 py-4">
                     <p className="font-medium text-slate-900">{user.name}</p>
                     <p className="mt-1 text-xs text-slate-500">{user.email}</p>
@@ -233,7 +234,7 @@ export default async function UserAccessPage({
                   <td className="px-5 py-4">
                     {user.role ? (
                       <>
-                        <span className="inline-flex rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700">
+                        <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
                           {user.role.name}
                         </span>
                         <p className="mt-2 text-xs text-slate-500">
@@ -241,7 +242,7 @@ export default async function UserAccessPage({
                         </p>
                       </>
                     ) : (
-                      <span className="inline-flex rounded-full bg-slate-900/8 px-3 py-1 text-xs font-medium text-slate-500">
+                      <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
                         No role
                       </span>
                     )}
@@ -293,17 +294,26 @@ export default async function UserAccessPage({
   )
 }
 
-function MetricCard({
+function StatChip({
+  icon: Icon,
   label,
   value,
 }: {
+  icon: React.ComponentType<{ className?: string }>
   label: string
   value: string
 }) {
   return (
-    <div className="rounded-[28px] border border-white/45 bg-white/50 p-5 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{value}</p>
+    <div className="rounded-2xl border border-white/50 bg-white/70 px-4 py-3 shadow-[0_18px_48px_-34px_rgba(15,23,42,0.95)]">
+      <div className="flex items-center gap-2">
+        <div className="flex size-9 items-center justify-center rounded-xl bg-slate-950 text-white">
+          <Icon className="size-4" />
+        </div>
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">{label}</p>
+          <p className="text-xl font-semibold tracking-tight text-slate-950">{value}</p>
+        </div>
+      </div>
     </div>
   )
 }

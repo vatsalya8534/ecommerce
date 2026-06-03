@@ -6,5 +6,5 @@ export default async function ProductDetailRedirect({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  redirect(`/admin/product?edit=${id}`)
+  redirect(`/admin/product/new?edit=${id}`)
 }

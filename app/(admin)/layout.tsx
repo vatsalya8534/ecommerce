@@ -56,7 +56,7 @@ export default async function AdminLayout({
         >
           <AppSidebar permissions={accessContext.permissions} />
 
-          <SidebarInset className="bg-transparent">
+          <SidebarInset className="min-w-0 bg-transparent">
             <header className="sticky top-0 z-50 px-4 pt-4 md:px-6">
               <div className="flex h-[4.5rem] items-center justify-between gap-4 rounded-[28px] border border-white/40 bg-white/55 px-4 shadow-[0_24px_70px_-46px_rgba(15,23,42,0.9)] backdrop-blur-2xl transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-16">
                 <div className="flex items-center gap-3">
@@ -88,7 +88,7 @@ export default async function AdminLayout({
               </div>
             </header>
 
-            <div className="flex flex-1 flex-col gap-6 p-4 pt-6 md:px-6 md:pb-6">
+            <div className="flex min-w-0 flex-1 flex-col gap-6 p-4 pt-6 md:px-6 md:pb-6">
               {children}
             </div>
           </SidebarInset>

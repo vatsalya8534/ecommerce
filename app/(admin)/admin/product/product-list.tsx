@@ -1,7 +1,7 @@
 "use client"
 
-import Link from "next/link"
 import Image from "next/image"
+import Link from "next/link"
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 import { useState } from "react"
 
@@ -64,15 +64,28 @@ export function ProductList({
                       <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
                         ${product.price.toFixed(2)}
                       </span>
+                      {typeof product.compareAtPrice === "number" ? (
+                        <span className="rounded-full bg-amber-500/10 px-2.5 py-1 text-[11px] font-medium text-amber-700 line-through">
+                          ${product.compareAtPrice.toFixed(2)}
+                        </span>
+                      ) : null}
                       <span className="rounded-full bg-slate-900/6 px-2.5 py-1 text-[11px] font-medium text-slate-600">
                         {product.stockStatus}
                       </span>
+                      {product.isFeatured ? (
+                        <span className="rounded-full bg-fuchsia-500/10 px-2.5 py-1 text-[11px] font-medium text-fuchsia-700">
+                          Featured
+                        </span>
+                      ) : null}
                       <span className="rounded-full bg-sky-500/10 px-2.5 py-1 text-[11px] font-medium text-sky-700">
                         {product.imageCount} image{product.imageCount === 1 ? "" : "s"}
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-slate-500">
-                      {product.categoryName} | {product.categorySlug}
+                      {product.brand ?? "No brand"} | {product.categoryName} | {product.categorySlug}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      SKU: {product.sku ?? "Not set"} | Slug: {product.slug ?? "Not set"}
                     </p>
                     {product.blurb ? (
                       <p className="mt-2 line-clamp-1 text-sm text-slate-500">{product.blurb}</p>
@@ -85,7 +98,7 @@ export function ProductList({
               </CollapsibleTrigger>
 
               <CollapsibleContent className="border-t border-white/20 bg-white/30 px-5 py-4">
-                <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr_auto] lg:items-start">
+                <div className="grid gap-4 lg:grid-cols-[1.45fr_0.95fr_auto] lg:items-start">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
                       Description
@@ -93,6 +106,24 @@ export function ProductList({
                     <p className="mt-2 text-sm leading-6 text-slate-600">
                       {product.description ?? product.blurb ?? "No description yet."}
                     </p>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                      <MiniStat label="Stock" value={String(product.stockQuantity)} />
+                      <MiniStat
+                        label="Compare-at"
+                        value={typeof product.compareAtPrice === "number" ? `$${product.compareAtPrice.toFixed(2)}` : "Not set"}
+                      />
+                      <MiniStat label="Colors" value={String(product.colorOptions.length)} />
+                      <MiniStat label="Sizes" value={String(product.sizeOptions.length)} />
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <InfoBlock title="Highlights" value={formatListPreview(product.highlights)} />
+                      <InfoBlock title="Specifications" value={formatListPreview(product.specifications)} />
+                      <InfoBlock title="Tags" value={formatListPreview(product.tags)} />
+                      <InfoBlock title="Materials" value={formatListPreview(product.materials)} />
+                    </div>
+
                     {product.imageUrls.length ? (
                       <div className="mt-4 flex flex-wrap gap-3">
                         {product.imageUrls.map((imageUrl, index) => (
@@ -115,7 +146,14 @@ export function ProductList({
                     </p>
                     <div className="mt-2 space-y-2 text-sm text-slate-600">
                       <p>Category: {product.categoryName}</p>
-                      <p>Badge: {product.badge ?? "No badge"}</p>
+                      <p>Brand: {product.brand ?? "No brand"}</p>
+                      <p>Seller: {product.sellerName ?? "No seller"}</p>
+                      <p>Published: {product.isActive ? "Yes" : "No"}</p>
+                      <p>Featured: {product.isFeatured ? "Yes" : "No"}</p>
+                      <p>Weight: {product.weight !== null ? `${product.weight} kg` : "Not set"}</p>
+                      <p>Dimensions: {product.dimensions ?? "Not set"}</p>
+                      <p>Barcode: {product.barcode ?? "Not set"}</p>
+                      <p>Tax rate: {product.taxRate !== null ? `${product.taxRate}%` : "Not set"}</p>
                       <p>Updated: {product.updatedAt.toLocaleString()}</p>
                     </div>
                   </div>
@@ -182,4 +220,42 @@ export function ProductList({
       </div>
     </section>
   )
+}
+
+function MiniStat({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="rounded-2xl border border-white/45 bg-white/55 px-3 py-2">
+      <p className="text-xs uppercase tracking-[0.14em] text-slate-400">{label}</p>
+      <p className="mt-1 text-sm font-medium text-slate-900">{value}</p>
+    </div>
+  )
+}
+
+function InfoBlock({
+  title,
+  value,
+}: {
+  title: string
+  value: string
+}) {
+  return (
+    <div className="rounded-2xl border border-white/45 bg-white/55 px-3 py-2">
+      <p className="text-xs uppercase tracking-[0.14em] text-slate-400">{title}</p>
+      <p className="mt-1 text-sm text-slate-700">{value}</p>
+    </div>
+  )
+}
+
+function formatListPreview(items: string[]) {
+  if (!items.length) {
+    return "Not set"
+  }
+
+  return items.slice(0, 3).join(", ") + (items.length > 3 ? "..." : "")
 }

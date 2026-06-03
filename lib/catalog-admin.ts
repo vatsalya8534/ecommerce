@@ -26,16 +26,41 @@ export type CategoryAdminRecord = {
 export type ProductAdminRecord = {
   id: string
   name: string
+  slug: string | null
+  sku: string | null
+  brand: string | null
+  sellerName: string | null
   price: number
+  compareAtPrice: number | null
+  taxRate: number | null
+  stockQuantity: number
+  minOrderQuantity: number
+  maxOrderQuantity: number | null
+  weight: number | null
+  dimensions: string | null
+  barcode: string | null
   imageCount: number
   imageSrc: string
   imageAlt: string | null
   imageUrls: string[]
   blurb: string | null
   description: string | null
+  seoTitle: string | null
+  seoDescription: string | null
   badge: string | null
   bgClassName: string | null
   stockStatus: string
+  isFeatured: boolean
+  isActive: boolean
+  colorOptions: string[]
+  sizeOptions: string[]
+  materials: string[]
+  tags: string[]
+  highlights: string[]
+  specifications: string[]
+  shippingDetails: string | null
+  careInstructions: string | null
+  warranty: string | null
   createdAt: Date
   updatedAt: Date
   categoryId: string
@@ -68,14 +93,39 @@ type CategoryWithCount = {
 type ProductWithCategory = {
   id: string
   name: string
+  slug: string | null
+  sku: string | null
+  brand: string | null
+  sellerName: string | null
   price: number
+  compareAtPrice: number | null
+  taxRate: number | null
+  stockQuantity: number
+  minOrderQuantity: number
+  maxOrderQuantity: number | null
+  weight: number | null
+  dimensions: string | null
+  barcode: string | null
   imageSrc: string
   imageAlt: string | null
   blurb: string | null
   description: string | null
+  seoTitle: string | null
+  seoDescription: string | null
   badge: string | null
   bgClassName: string | null
   stockStatus: string
+  isFeatured: boolean
+  isActive: boolean
+  colorOptions: string[]
+  sizeOptions: string[]
+  materials: string[]
+  tags: string[]
+  highlights: string[]
+  specifications: string[]
+  shippingDetails: string | null
+  careInstructions: string | null
+  warranty: string | null
   createdAt: Date
   updatedAt: Date
   category: {
@@ -119,7 +169,19 @@ function mapProductRecord(product: ProductWithCategory): ProductAdminRecord {
   return {
     id: product.id,
     name: product.name,
+    slug: product.slug,
+    sku: product.sku,
+    brand: product.brand,
+    sellerName: product.sellerName,
     price: product.price,
+    compareAtPrice: product.compareAtPrice ?? null,
+    taxRate: product.taxRate ?? null,
+    stockQuantity: product.stockQuantity,
+    minOrderQuantity: product.minOrderQuantity,
+    maxOrderQuantity: product.maxOrderQuantity ?? null,
+    weight: product.weight ?? null,
+    dimensions: product.dimensions,
+    barcode: product.barcode,
     imageCount: product.images.length,
     imageSrc: product.images[0]
       ? `/api/product-images/${product.images[0].id}`
@@ -128,9 +190,22 @@ function mapProductRecord(product: ProductWithCategory): ProductAdminRecord {
     imageUrls: product.images.map((image) => `/api/product-images/${image.id}`),
     blurb: product.blurb,
     description: product.description,
+    seoTitle: product.seoTitle,
+    seoDescription: product.seoDescription,
     badge: product.badge,
     bgClassName: product.bgClassName,
     stockStatus: product.stockStatus,
+    isFeatured: product.isFeatured ?? false,
+    isActive: product.isActive ?? true,
+    colorOptions: product.colorOptions ?? [],
+    sizeOptions: product.sizeOptions ?? [],
+    materials: product.materials ?? [],
+    tags: product.tags ?? [],
+    highlights: product.highlights ?? [],
+    specifications: product.specifications ?? [],
+    shippingDetails: product.shippingDetails ?? null,
+    careInstructions: product.careInstructions ?? null,
+    warranty: product.warranty ?? null,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
     categoryId: product.category.id,
@@ -167,8 +242,9 @@ export async function ensureCatalogSeeded() {
         stats: category.stats,
         highlights: category.highlights,
         products: {
-          create: category.products.map((product) => ({
+          create: category.products.map((product, productIndex) => ({
             name: product.name,
+            slug: `${category.slug}-${productIndex + 1}`,
             price: parsePrice(product.price),
             imageSrc: product.imageSrc,
             imageAlt: product.imageAlt,
@@ -256,14 +332,14 @@ export async function getAdminProducts() {
           slug: true,
         },
       },
-      images: {
-        orderBy: {
-          sortOrder: "asc",
+        images: {
+          orderBy: {
+            sortOrder: "asc",
+          },
+          select: {
+            id: true,
+          },
         },
-        select: {
-          id: true,
-        },
-      },
     },
   })
 
@@ -289,14 +365,14 @@ export async function getAdminProductById(id: string) {
           slug: true,
         },
       },
-      images: {
-        orderBy: {
-          sortOrder: "asc",
+        images: {
+          orderBy: {
+            sortOrder: "asc",
+          },
+          select: {
+            id: true,
+          },
         },
-        select: {
-          id: true,
-        },
-      },
     },
   })
 

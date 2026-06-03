@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { CheckSquareIcon, ShieldCheckIcon, UsersIcon } from "lucide-react"
 
 import {
   createRoleAction,
@@ -79,38 +80,50 @@ export default async function RoleRegistryPage({ searchParams }: RolePageProps) 
   return (
     <div className="flex flex-col gap-6">
       <section className="rounded-[30px] border border-white/45 bg-white/55 p-6 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
-        <p className="text-sm font-medium text-slate-500">Role registry</p>
-        <h2 className="mt-1 text-2xl font-semibold text-slate-950">
-          Build roles from the modules you want each team to access.
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-          Every role can choose whether a module is visible and whether the user can
-          take actions inside it. Action permission automatically includes view access.
-        </p>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-medium text-slate-500">Role registry</p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+              Build roles from the modules you want each team to access.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
+              Every role can choose whether a module is visible and whether the user can take
+              actions inside it. Action permission automatically includes view access.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <StatChip icon={ShieldCheckIcon} label="Roles" value={String(roles.length)} />
+            <StatChip icon={UsersIcon} label="Assigned users" value={String(roles.reduce((sum, role) => sum + role.users.length, 0))} />
+            <StatChip icon={CheckSquareIcon} label="Modules" value={String(modules.length)} />
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.15fr_1.55fr]">
         {canManage ? (
-          <div className="rounded-[30px] border border-white/45 bg-white/55 p-5 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
-            <div className="flex items-center justify-between gap-3">
+          <div className="rounded-[32px] border border-white/50 bg-white/60 p-5 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
+            <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-slate-950">
+                <h3 className="text-lg font-semibold tracking-tight text-slate-950">
                   {editRole ? "Edit role" : "Create role"}
                 </h3>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
                   {editRole
                     ? "Adjust module-level permissions for this role."
                     : "Create a reusable permission bundle for users."}
                 </p>
               </div>
-              {editRole ? (
-                <Link
-                  href="/admin/user/roles"
-                  className="text-sm font-medium text-slate-500 hover:text-slate-900"
-                >
-                  Clear
-                </Link>
-              ) : null}
+              <div className="flex items-center gap-2">
+                {editRole ? (
+                  <Link
+                    href="/admin/user/roles"
+                    className="rounded-full border border-slate-200 px-3 py-1 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Clear edit
+                  </Link>
+                ) : null}
+              </div>
             </div>
 
             {editRole?.isSystem ? (
@@ -149,21 +162,21 @@ export default async function RoleRegistryPage({ searchParams }: RolePageProps) 
                     </div>
                   </div>
 
-                  <div className="overflow-hidden rounded-[24px] border border-white/45 bg-white/60">
-                    <table className="min-w-full divide-y divide-white/25 text-left">
-                      <thead className="bg-white/45 text-xs uppercase tracking-[0.16em] text-slate-400">
+                  <div className="overflow-hidden rounded-[24px] border border-slate-100 bg-white/60">
+                    <table className="min-w-full divide-y divide-slate-100 text-left">
+                      <thead className="bg-[#0ea5e9] text-xs uppercase tracking-[0.16em] text-white">
                         <tr>
                           <th className="px-4 py-3 font-medium">Module</th>
                           <th className="px-4 py-3 font-medium">View</th>
                           <th className="px-4 py-3 font-medium">Action</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-white/20 text-sm text-slate-700">
+                      <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                         {modules.map((moduleRecord) => {
                           const selected = selectedPermissions.get(moduleRecord.id)
 
                           return (
-                            <tr key={moduleRecord.id}>
+                            <tr key={moduleRecord.id} className={moduleRecord.id % 2 === 0 ? "bg-white" : "bg-slate-50/40"}>
                               <td className="px-4 py-3">
                                 <p className="font-medium text-slate-900">{moduleRecord.name}</p>
                                 <p className="mt-1 text-xs text-slate-500">
@@ -175,7 +188,7 @@ export default async function RoleRegistryPage({ searchParams }: RolePageProps) 
                                   type="checkbox"
                                   name={`view:${moduleRecord.id}`}
                                   defaultChecked={selected?.canView ?? false}
-                                  className="size-4 rounded border-slate-300"
+                                  className="size-4 rounded border-slate-300 text-sky-600"
                                 />
                               </td>
                               <td className="px-4 py-3">
@@ -183,7 +196,7 @@ export default async function RoleRegistryPage({ searchParams }: RolePageProps) 
                                   type="checkbox"
                                   name={`action:${moduleRecord.id}`}
                                   defaultChecked={selected?.canAction ?? false}
-                                  className="size-4 rounded border-slate-300"
+                                  className="size-4 rounded border-slate-300 text-sky-600"
                                 />
                               </td>
                             </tr>
@@ -196,7 +209,7 @@ export default async function RoleRegistryPage({ searchParams }: RolePageProps) 
 
                 <button
                   type="submit"
-                  className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+                  className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
                 >
                   {editRole ? "Save role" : "Create role"}
                 </button>
@@ -205,17 +218,17 @@ export default async function RoleRegistryPage({ searchParams }: RolePageProps) 
           </div>
         ) : null}
 
-        <div className="overflow-hidden rounded-[30px] border border-white/45 bg-white/55 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
-          <div className="border-b border-white/40 px-5 py-5">
-            <h3 className="text-lg font-semibold text-slate-950">All roles</h3>
-            <p className="mt-1 text-sm text-slate-500">
+        <div className="overflow-hidden rounded-[32px] border border-white/50 bg-white/60 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
+          <div className="border-b border-slate-100 px-5 py-5">
+            <h3 className="text-lg font-semibold tracking-tight text-slate-950">All roles</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-500">
               {roles.length} role(s) currently available for user assignment.
             </p>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-white/30 text-left">
-              <thead className="bg-white/35 text-xs uppercase tracking-[0.18em] text-slate-400">
+            <table className="min-w-full divide-y divide-slate-100 text-left">
+              <thead className="bg-[#0ea5e9] text-xs uppercase tracking-[0.18em] text-white">
                 <tr>
                   <th className="px-5 py-3 font-medium">Role</th>
                   <th className="px-5 py-3 font-medium">Permissions</th>
@@ -223,14 +236,14 @@ export default async function RoleRegistryPage({ searchParams }: RolePageProps) 
                   <th className="px-5 py-3 font-medium">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/20">
-                {roles.map((role) => (
-                  <tr key={role.id} className="align-top text-sm text-slate-700">
+              <tbody className="divide-y divide-slate-100">
+                {roles.map((role, index) => (
+                  <tr key={role.id} className={`align-top text-sm text-slate-700 ${index % 2 === 0 ? "bg-white" : "bg-slate-50/40"}`}>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-slate-900">{role.name}</p>
                         {role.isSystem ? (
-                          <span className="rounded-full bg-sky-500/10 px-2 py-0.5 text-[11px] font-medium text-sky-700">
+                          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-700">
                             System
                           </span>
                         ) : null}
@@ -255,7 +268,7 @@ export default async function RoleRegistryPage({ searchParams }: RolePageProps) 
                         {canManage && !role.isSystem ? (
                           <Link
                             href={`/admin/user/roles?edit=${role.id}`}
-                            className="text-slate-700 hover:text-slate-950"
+                            className="rounded-full border border-slate-200 px-3 py-1.5 text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
                           >
                             Edit
                           </Link>
@@ -263,7 +276,7 @@ export default async function RoleRegistryPage({ searchParams }: RolePageProps) 
                         {canManage && !role.isSystem ? (
                           <form action={deleteRoleAction}>
                             <input type="hidden" name="id" value={role.id} />
-                            <button type="submit" className="text-rose-600 hover:text-rose-700">
+                            <button type="submit" className="rounded-full border border-rose-200 px-3 py-1.5 text-rose-600 transition hover:bg-rose-50 hover:text-rose-700">
                               Delete
                             </button>
                           </form>
@@ -294,5 +307,29 @@ function Field({
       <span className="mb-2 block text-sm font-medium text-slate-700">{label}</span>
       {children}
     </label>
+  )
+}
+
+function StatChip({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  value: string
+}) {
+  return (
+    <div className="rounded-2xl border border-white/50 bg-white/70 px-4 py-3 shadow-[0_18px_48px_-34px_rgba(15,23,42,0.95)]">
+      <div className="flex items-center gap-2">
+        <div className="flex size-9 items-center justify-center rounded-xl bg-slate-950 text-white">
+          <Icon className="size-4" />
+        </div>
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">{label}</p>
+          <p className="text-xl font-semibold tracking-tight text-slate-950">{value}</p>
+        </div>
+      </div>
+    </div>
   )
 }

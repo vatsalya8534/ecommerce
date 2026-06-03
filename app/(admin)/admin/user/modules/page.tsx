@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { BoxesIcon, Layers3Icon, ShieldCheckIcon } from "lucide-react"
 
 import {
   createModuleAction,
@@ -55,25 +56,35 @@ export default async function ModuleRegistryPage({ searchParams }: ModulePagePro
   return (
     <div className="flex flex-col gap-6">
       <section className="rounded-[30px] border border-white/45 bg-white/55 p-6 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
-        <p className="text-sm font-medium text-slate-500">Module registry</p>
-        <h2 className="mt-1 text-2xl font-semibold text-slate-950">
-          Manage the source list used by every RBAC role.
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-          Every role reads from this list. Add new modules here first, then attach them
-          to roles with view or action permission.
-        </p>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-medium text-slate-500">Module registry</p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+              Manage the source list used by every RBAC role.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
+              Every role reads from this list. Add new modules here first, then attach them to roles
+              with view or action permission.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <StatChip icon={BoxesIcon} label="Modules" value={String(modules.length)} />
+            <StatChip icon={ShieldCheckIcon} label="System" value={String(modules.filter((moduleRecord) => moduleRecord.isSystem).length)} />
+            <StatChip icon={Layers3Icon} label="Grouped" value={String(new Set(modules.map((moduleRecord) => moduleRecord.groupName)).size)} />
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.1fr_1.6fr]">
         {canManage ? (
-          <div className="rounded-[30px] border border-white/45 bg-white/55 p-5 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
-            <div className="flex items-center justify-between gap-3">
+          <div className="rounded-[32px] border border-white/50 bg-white/60 p-5 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
+            <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-slate-950">
+                <h3 className="text-lg font-semibold tracking-tight text-slate-950">
                   {editModule ? "Edit module" : "Create module"}
                 </h3>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
                   {editModule
                     ? "Update the module metadata used in roles and navigation."
                     : "Create a new module so roles can grant access to it."}
@@ -82,9 +93,9 @@ export default async function ModuleRegistryPage({ searchParams }: ModulePagePro
               {editModule ? (
                 <Link
                   href="/admin/user/modules"
-                  className="text-sm font-medium text-slate-500 hover:text-slate-900"
+                  className="rounded-full border border-slate-200 px-3 py-1 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                 >
-                  Clear
+                  Clear edit
                 </Link>
               ) : null}
             </div>
@@ -145,7 +156,7 @@ export default async function ModuleRegistryPage({ searchParams }: ModulePagePro
               </div>
               <button
                 type="submit"
-                className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
               >
                 {editModule ? "Save module" : "Create module"}
               </button>
@@ -153,17 +164,17 @@ export default async function ModuleRegistryPage({ searchParams }: ModulePagePro
           </div>
         ) : null}
 
-        <div className="overflow-hidden rounded-[30px] border border-white/45 bg-white/55 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
-          <div className="border-b border-white/40 px-5 py-5">
-            <h3 className="text-lg font-semibold text-slate-950">All modules</h3>
-            <p className="mt-1 text-sm text-slate-500">
+        <div className="overflow-hidden rounded-[32px] border border-white/50 bg-white/60 shadow-[0_32px_90px_-56px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
+          <div className="border-b border-slate-100 px-5 py-5">
+            <h3 className="text-lg font-semibold tracking-tight text-slate-950">All modules</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-500">
               {modules.length} module(s) currently available for role permission mapping.
             </p>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-white/30 text-left">
-              <thead className="bg-white/35 text-xs uppercase tracking-[0.18em] text-slate-400">
+            <table className="min-w-full divide-y divide-slate-100 text-left">
+              <thead className="bg-[#0ea5e9] text-xs uppercase tracking-[0.18em] text-white">
                 <tr>
                   <th className="px-5 py-3 font-medium">Module</th>
                   <th className="px-5 py-3 font-medium">Path</th>
@@ -172,14 +183,14 @@ export default async function ModuleRegistryPage({ searchParams }: ModulePagePro
                   <th className="px-5 py-3 font-medium">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/20">
-                {modules.map((moduleRecord) => (
-                  <tr key={moduleRecord.id} className="align-top text-sm text-slate-700">
+              <tbody className="divide-y divide-slate-100">
+                {modules.map((moduleRecord, index) => (
+                  <tr key={moduleRecord.id} className={`align-top text-sm text-slate-700 ${index % 2 === 0 ? "bg-white" : "bg-slate-50/40"}`}>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-slate-900">{moduleRecord.name}</p>
                         {moduleRecord.isSystem ? (
-                          <span className="rounded-full bg-sky-500/10 px-2 py-0.5 text-[11px] font-medium text-sky-700">
+                          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-700">
                             System
                           </span>
                         ) : null}
@@ -205,7 +216,7 @@ export default async function ModuleRegistryPage({ searchParams }: ModulePagePro
                         {canManage && !moduleRecord.isSystem ? (
                           <Link
                             href={`/admin/user/modules?edit=${moduleRecord.id}`}
-                            className="text-slate-700 hover:text-slate-950"
+                            className="rounded-full border border-slate-200 px-3 py-1.5 text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
                           >
                             Edit
                           </Link>
@@ -213,7 +224,7 @@ export default async function ModuleRegistryPage({ searchParams }: ModulePagePro
                         {canManage && !moduleRecord.isSystem ? (
                           <form action={deleteModuleAction}>
                             <input type="hidden" name="id" value={moduleRecord.id} />
-                            <button type="submit" className="text-rose-600 hover:text-rose-700">
+                            <button type="submit" className="rounded-full border border-rose-200 px-3 py-1.5 text-rose-600 transition hover:bg-rose-50 hover:text-rose-700">
                               Delete
                             </button>
                           </form>
@@ -243,6 +254,30 @@ function Field({
       <span className="mb-2 block text-sm font-medium text-slate-700">{label}</span>
       {children}
     </label>
+  )
+}
+
+function StatChip({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  value: string
+}) {
+  return (
+    <div className="rounded-2xl border border-white/50 bg-white/70 px-4 py-3 shadow-[0_18px_48px_-34px_rgba(15,23,42,0.95)]">
+      <div className="flex items-center gap-2">
+        <div className="flex size-9 items-center justify-center rounded-xl bg-slate-950 text-white">
+          <Icon className="size-4" />
+        </div>
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">{label}</p>
+          <p className="text-xl font-semibold tracking-tight text-slate-950">{value}</p>
+        </div>
+      </div>
+    </div>
   )
 }
 
