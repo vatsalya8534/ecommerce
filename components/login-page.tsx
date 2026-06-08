@@ -11,6 +11,7 @@ type FormMode = "login" | "signup" | "forgot"
 type LoginPageProps = {
   initialMode?: FormMode
   successMessage?: string
+  redirectTo?: string
 }
 
 const initialState: AuthActionState = {}
@@ -18,6 +19,7 @@ const initialState: AuthActionState = {}
 export function LoginPage({
   initialMode = "login",
   successMessage,
+  redirectTo,
 }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [mode, setMode] = useState<FormMode>(initialMode)
@@ -69,9 +71,7 @@ export function LoginPage({
             <h2 className="mt-3 text-3xl font-black tracking-tight text-[#12180b]">
               {content.title}
             </h2>
-            <p className="mt-3 text-sm leading-6 text-[#5d6750]">1
-              {content.description}
-            </p>
+            <p className="mt-3 text-sm leading-6 text-[#5d6750]">{content.description}</p>
           </div>
 
           {successMessage ? (
@@ -88,6 +88,7 @@ export function LoginPage({
                     {loginState.error}
                   </div>
                 ) : null}
+                <input type="hidden" name="redirect" value={redirectTo ?? ""} />
 
                 <FieldSet label="Email address" icon={Mail}>
                   <input
@@ -155,6 +156,7 @@ export function LoginPage({
                     {signupState.error}
                   </div>
                 ) : null}
+                <input type="hidden" name="redirect" value={redirectTo ?? ""} />
 
                 <FieldSet label="Full name" icon={UserRound}>
                   <input
@@ -288,20 +290,5 @@ function FieldSet({
         {children}
       </div>
     </label>
-  )
-}
-
-function FeatureTile({
-  title,
-  text,
-}: {
-  title: string
-  text: string
-}) {
-  return (
-    <div className="rounded-3xl border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
-      <p className="text-sm font-semibold text-white">{title}</p>
-      <p className="mt-2 text-sm leading-6 text-[#d4ddc1]">{text}</p>
-    </div>
   )
 }

@@ -10,6 +10,7 @@ export default async function LoginRoutePage({
   searchParams: Promise<{
     mode?: string
     registered?: string
+    redirect?: string
   }>
 }) {
   const user = await getCurrentUser()
@@ -24,6 +25,7 @@ export default async function LoginRoutePage({
   return (
     <LoginPage
       initialMode={params.mode === "signup" ? "signup" : "login"}
+      redirectTo={typeof params.redirect === "string" ? params.redirect : undefined}
       successMessage={
         params.registered
           ? "Account created successfully. Log in with your new credentials."

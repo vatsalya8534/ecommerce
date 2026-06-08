@@ -172,11 +172,11 @@ export default async function RoleRegistryPage({ searchParams }: RolePageProps) 
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                        {modules.map((moduleRecord) => {
+                        {modules.map((moduleRecord, index) => {
                           const selected = selectedPermissions.get(moduleRecord.id)
 
                           return (
-                            <tr key={moduleRecord.id} className={moduleRecord.id % 2 === 0 ? "bg-white" : "bg-slate-50/40"}>
+                            <tr key={moduleRecord.id} className={index % 2 === 0 ? "bg-white" : "bg-slate-50/40"}>
                               <td className="px-4 py-3">
                                 <p className="font-medium text-slate-900">{moduleRecord.name}</p>
                                 <p className="mt-1 text-xs text-slate-500">

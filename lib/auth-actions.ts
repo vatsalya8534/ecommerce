@@ -20,6 +20,14 @@ export type AuthActionState = {
   error?: string
 }
 
+function sanitizeRedirectPath(value: string) {
+  if (!value.startsWith("/") || value.startsWith("//")) {
+    return null
+  }
+
+  return value
+}
+
 export async function signInAction(
   _previousState: AuthActionState,
   formData: FormData,
@@ -30,6 +38,7 @@ export async function signInAction(
 
   const email = String(formData.get("email") ?? "").trim()
   const password = String(formData.get("password") ?? "")
+  const redirectTarget = sanitizeRedirectPath(String(formData.get("redirect") ?? "").trim())
 
   if (!email || !password) {
     return { error: "Email and password are required." }
@@ -60,6 +69,10 @@ export async function signInAction(
 
   await setSessionCookie(token)
 
+  if (redirectTarget) {
+    redirect(redirectTarget)
+  }
+
   const accessContext = await getUserAccessContext(user.id)
   redirect(accessContext ? getFirstAccessibleAdminPath(accessContext.permissions) : "/")
 }
@@ -76,6 +89,7 @@ export async function signUpAction(
   const email = String(formData.get("email") ?? "").trim()
   const password = String(formData.get("password") ?? "")
   const confirmPassword = String(formData.get("confirmPassword") ?? "")
+  const redirectTarget = sanitizeRedirectPath(String(formData.get("redirect") ?? "").trim())
 
   if (!name || !email || !password || !confirmPassword) {
     return { error: "Please fill in all fields." }
@@ -116,5 +130,5 @@ export async function signUpAction(
     return { error: "An account with this email already exists." }
   }
 
-  redirect("/login?registered=1")
+  redirect(`/login?mode=login&registered=1${redirectTarget ? `&redirect=${encodeURIComponent(redirectTarget)}` : ""}`)
 }

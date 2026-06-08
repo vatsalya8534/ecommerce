@@ -3,13 +3,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Minus, Plus, ShieldCheck, ShoppingBag, Trash2, Truck } from "lucide-react";
+import {
+  ArrowLeft,
+  Minus,
+  Plus,
+  ShieldCheck,
+  ShoppingBag,
+  Trash2,
+  Truck,
+} from "lucide-react";
 import { useCart } from "@/components/use-cart";
 import { formatPrice } from "@/lib/format-price";
 
 const protectPromiseFee = 19;
 
-export function CartPage() {
+export function CartPage({ isAuthenticated }: { isAuthenticated: boolean }) {
   const router = useRouter();
   const { cartItems, subtotal, discountTotal, total, removeItem, updateQuantity, clearCart } = useCart();
 
@@ -74,13 +82,22 @@ export function CartPage() {
               Review selected products, adjust quantity, and see your savings update instantly.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={clearCart}
-            className="inline-flex w-fit items-center justify-center rounded-full border border-[#cad2bb] px-5 py-3 text-sm font-semibold text-[#263118] transition hover:bg-[#f5f8ef]"
-          >
-            Clear cart
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/admin/dashboard"
+              className="inline-flex w-fit items-center justify-center gap-2 rounded-full border border-[#cad2bb] px-5 py-3 text-sm font-semibold text-[#263118] transition hover:bg-[#f5f8ef]"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Link>
+            <button
+              type="button"
+              onClick={clearCart}
+              className="inline-flex w-fit items-center justify-center rounded-full border border-[#cad2bb] px-5 py-3 text-sm font-semibold text-[#263118] transition hover:bg-[#f5f8ef]"
+            >
+              Clear cart
+            </button>
+          </div>
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
@@ -216,6 +233,29 @@ export function CartPage() {
                   You&apos;ll save {formatPrice(discountTotal)} on this order.
                 </div>
 
+                {!isAuthenticated ? (
+                  <div className="rounded-[1.4rem] border border-[#d9e6cb] bg-[#fbfdf7] p-4">
+                    <p className="text-sm font-bold text-[#223013]">Sign in to place your order</p>
+                    <p className="mt-1 text-sm leading-6 text-[#556048]">
+                      Your cart stays saved, and checkout will unlock after login or signup.
+                    </p>
+                    <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                      <Link
+                        href="/login?mode=login&redirect=/checkout"
+                        className="inline-flex items-center justify-center rounded-full bg-[#2f3b1d] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#243015]"
+                      >
+                        Log in
+                      </Link>
+                      <Link
+                        href="/login?mode=signup&redirect=/checkout"
+                        className="inline-flex items-center justify-center rounded-full border border-[#cad2bb] px-5 py-3 text-sm font-semibold text-[#263118] transition hover:bg-[#f5f8ef]"
+                      >
+                        Sign up
+                      </Link>
+                    </div>
+                  </div>
+                ) : null}
+
                 <div className="space-y-3 rounded-[1.6rem] bg-[#f7f9f4] p-4">
                   <div className="flex items-start gap-3">
                     <ShieldCheck className="mt-0.5 h-5 w-5 text-[#30411a]" />
@@ -233,10 +273,14 @@ export function CartPage() {
 
                 <button
                   type="button"
-                  onClick={() => router.push("/checkout")}
+                  onClick={() =>
+                    router.push(
+                      isAuthenticated ? "/checkout" : "/login?mode=login&redirect=/checkout",
+                    )
+                  }
                   className="inline-flex w-full items-center justify-center rounded-full bg-[#f4b400] px-6 py-4 text-sm font-black text-[#2b2100] transition hover:bg-[#e8aa00]"
                 >
-                  Checkout
+                  {isAuthenticated ? "Checkout" : "Log in to checkout"}
                 </button>
               </div>
             </div>

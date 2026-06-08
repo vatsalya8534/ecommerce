@@ -1,18 +1,21 @@
 import Link from "next/link";
-import { CreditCard, MapPin, Package, ShieldCheck, UserRound } from "lucide-react";
+import { CreditCard, MapPin, Package, ShieldCheck, ShoppingCart } from "lucide-react";
+import type { AuthUser } from "@/lib/auth-types";
 
 export function AccountSidebar({
   activeSection,
+  user,
 }: {
-  activeSection: "profile" | "orders";
+  activeSection: "cart" | "orders" | "profile";
+  user?: AuthUser;
 }) {
   const links = [
     {
-      href: "/account/profile",
-      label: "Profile",
-      description: "Personal details and saved addresses",
-      icon: UserRound,
-      key: "profile",
+      href: "/cart",
+      label: "Cart",
+      description: "Review your cart and continue checkout",
+      icon: ShoppingCart,
+      key: "cart",
     },
     {
       href: "/account/orders",
@@ -29,8 +32,8 @@ export function AccountSidebar({
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/75">
           Account
         </p>
-        <h2 className="mt-3 text-xl font-bold">Aarav Sharma</h2>
-        <p className="mt-1 text-sm text-white/80">aarav.sharma@example.com</p>
+        <h2 className="mt-3 text-xl font-bold">{user?.name ?? "Aarav Sharma"}</h2>
+        <p className="mt-1 text-sm text-white/80">{user?.email ?? "aarav.sharma@example.com"}</p>
       </div>
 
       <nav className="mt-4 space-y-2">

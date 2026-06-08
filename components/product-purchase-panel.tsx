@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Minus, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/use-cart";
 import type { ProductEntry } from "@/lib/product-catalog";
@@ -18,6 +18,16 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
+  const canDecreaseQuantity = quantity > 1;
+  const canIncreaseQuantity = quantity < 10;
+
+  function decreaseQuantity() {
+    setQuantity((current) => Math.max(1, current - 1));
+  }
+
+  function increaseQuantity() {
+    setQuantity((current) => Math.min(10, current + 1));
+  }
 
   function handleAddToCart() {
     startTransition(() => {
@@ -88,23 +98,39 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
         </div>
       </div>
 
-      <div className="mt-5 max-w-[180px]">
+      <div className="mt-5 max-w-[240px]">
         <label htmlFor="quantity" className="text-sm font-semibold text-[#222d14]">
           Quantity
         </label>
-        <select
+        <div
           id="quantity"
-          value={quantity}
-          onChange={(event) => setQuantity(Number(event.target.value))}
+          className="mt-2 flex items-center overflow-hidden rounded-2xl border border-[#d8dfcc] bg-white shadow-sm"
           suppressHydrationWarning
-          className="mt-2 w-full rounded-2xl border border-[#d8dfcc] bg-white px-4 py-3 text-sm text-[#253116] outline-none transition focus:border-[#93a374]"
         >
-          {Array.from({ length: 10 }).map((_, index) => (
-            <option key={index + 1} value={index + 1}>
-              Qty: {index + 1}
-            </option>
-          ))}
-        </select>
+          <button
+            type="button"
+            onClick={decreaseQuantity}
+            disabled={!canDecreaseQuantity || isPending}
+            aria-label="Decrease quantity"
+            className="inline-flex h-12 w-12 items-center justify-center text-[#445133] transition hover:bg-[#f3f6ed] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <Minus className="h-4 w-4" />
+          </button>
+
+          <div className="flex min-h-12 flex-1 items-center justify-center border-x border-[#e7ecdd] px-4 text-sm font-bold text-[#253116]">
+             {quantity}
+          </div>
+
+          <button
+            type="button"
+            onClick={increaseQuantity}
+            disabled={!canIncreaseQuantity || isPending}
+            aria-label="Increase quantity"
+            className="inline-flex h-12 w-12 items-center justify-center text-[#445133] transition hover:bg-[#f3f6ed] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">

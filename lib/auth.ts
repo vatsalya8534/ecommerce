@@ -4,15 +4,10 @@ import { createHash, pbkdf2Sync, randomBytes } from "node:crypto"
 import { cookies } from "next/headers"
 
 import { hasDatabaseUrl, prisma } from "@/lib/prisma"
+import type { AuthUser } from "@/lib/auth-types"
 
 export const SESSION_COOKIE_NAME = "shophub_session"
 export const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 30
-
-export type AuthUser = {
-  id: string
-  name: string
-  email: string
-}
 
 type SessionWithUser = {
   id: string

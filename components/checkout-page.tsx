@@ -2,24 +2,22 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CreditCard, Landmark, ShieldCheck, ShoppingBag, Smartphone, Truck } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/components/use-cart";
 import { formatPrice } from "@/lib/format-price";
+import type { AuthUser } from "@/lib/auth-types";
+import { GuestAccessPrompt } from "@/components/guest-access-prompt";
+import {
+  createOrderFromCheckout,
+  saveStoredOrder,
+  type CheckoutAddress,
+} from "@/lib/order-storage";
 
 const protectPromiseFee = 19;
 
-type AddressFields = {
-  fullName: string;
-  phone: string;
-  email: string;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-};
+type AddressFields = CheckoutAddress;
 
 const emptyAddress: AddressFields = {
   fullName: "",
@@ -87,12 +85,30 @@ function Field({
   );
 }
 
-export function CheckoutPage() {
-  const { cartItems, subtotal, discountTotal, total } = useCart();
-  const [shippingAddress, setShippingAddress] = useState<AddressFields>(emptyAddress);
-  const [billingAddress, setBillingAddress] = useState<AddressFields>(emptyAddress);
+export function CheckoutPage({ user }: { user?: AuthUser }) {
+  const router = useRouter();
+  const { cartItems, subtotal, discountTotal, total, clearCart } = useCart();
+  const [shippingAddress, setShippingAddress] = useState<AddressFields>(() =>
+    user
+      ? {
+          ...emptyAddress,
+          fullName: user.name,
+          email: user.email,
+        }
+      : emptyAddress
+  );
+  const [billingAddress, setBillingAddress] = useState<AddressFields>(() =>
+    user
+      ? {
+          ...emptyAddress,
+          fullName: user.name,
+          email: user.email,
+        }
+      : emptyAddress
+  );
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<(typeof paymentOptions)[number]["value"]>("card");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const detailedItems = cartItems
     .map((item) => {
@@ -122,6 +138,47 @@ export function CheckoutPage() {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!user || isSubmitting || detailedItems.length === 0) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const order = createOrderFromCheckout({
+        cartItems,
+        subtotal,
+        discountTotal,
+        serviceFee,
+        total: orderTotal,
+        shippingAddress,
+        billingAddress: billingSameAsShipping ? shippingAddress : billingAddress,
+        paymentMethod,
+        user,
+      });
+
+      saveStoredOrder(order);
+      clearCart();
+      router.push("/account/orders?placed=1");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[linear-gradient(180deg,_#f7faf3_0%,_#ffffff_45%,_#f4f7ef_100%)] px-4 py-10 sm:px-6 lg:px-8">
+        <GuestAccessPrompt
+          title="Sign in to complete checkout"
+          description="Your cart is saved already. Sign in or create an account to place the order, keep your history, and view it in Orders."
+          primaryLabel="Log in to checkout"
+          secondaryLabel="Create account"
+          primaryHref="/login?mode=login&redirect=/checkout"
+          secondaryHref="/login?mode=signup&redirect=/checkout"
+        />
+      </div>
+    );
   }
 
   if (detailedItems.length === 0) {
@@ -353,9 +410,10 @@ export function CheckoutPage() {
 
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className="inline-flex w-full items-center justify-center rounded-full bg-[#f4b400] px-6 py-4 text-sm font-black text-[#2b2100] transition hover:bg-[#e8aa00]"
                 >
-                  Confirm order
+                  {isSubmitting ? "Placing order..." : "Confirm order"}
                 </button>
 
               </div>

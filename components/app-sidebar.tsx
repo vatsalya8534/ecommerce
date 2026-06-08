@@ -1,12 +1,11 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import * as React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   ChevronRightIcon,
   FolderKanbanIcon,
-  LayoutDashboardIcon,
   Package2Icon,
   Settings2Icon,
   ShieldIcon,
@@ -14,9 +13,9 @@ import {
   SparklesIcon,
   TagIcon,
   UserIcon,
-} from "lucide-react"
+} from "lucide-react";
 
-import { type PermissionSnapshot } from "@/lib/rbac"
+import { type PermissionSnapshot } from "@/lib/rbac";
 import {
   Sidebar,
   SidebarContent,
@@ -28,25 +27,27 @@ import {
   SidebarMenuItem,
   SidebarRail,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 type NavigationSubItem = {
-  title: string
-  href: string
-  description: string
-}
+  title: string;
+  href: string;
+  description: string;
+};
 
 type NavigationItem = {
-  key: string
-  title: string
-  href: string
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
-  hint: string
-  subItems?: NavigationSubItem[]
-}
+  key: string;
+  title: string;
+  href: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  hint: string;
+  subItems?: NavigationSubItem[];
+};
 
-const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
-  dashboard: LayoutDashboardIcon,
+const iconMap: Record<
+  string,
+  React.ComponentType<React.SVGProps<SVGSVGElement>>
+> = {
   orders: ShoppingBagIcon,
   products: Package2Icon,
   categories: TagIcon,
@@ -54,10 +55,9 @@ const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>
   roles: ShieldIcon,
   modules: FolderKanbanIcon,
   configuration: Settings2Icon,
-}
+};
 
 const moduleHints: Record<string, string> = {
-  dashboard: "Today",
   orders: "Live",
   products: "Catalog",
   categories: "Browse",
@@ -65,9 +65,21 @@ const moduleHints: Record<string, string> = {
   roles: "RBAC",
   modules: "Source",
   configuration: "Browse",
-}
+};
 
 const moduleSubItems: Record<string, NavigationSubItem[]> = {
+  orders: [
+    {
+      title: "My Orders",
+      href: "/account/orders",
+      description: "Review checkout history and shipment details",
+    },
+    {
+      title: "Cart",
+      href: "/cart",
+      description: "Resume the active cart before checkout",
+    },
+  ],
   users: [
     {
       title: "All Users",
@@ -85,32 +97,42 @@ const moduleSubItems: Record<string, NavigationSubItem[]> = {
       description: "Manage the module registry",
     },
   ],
-}
+};
 
 export function AppSidebar({
   permissions,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
-  permissions: PermissionSnapshot[]
+  permissions: PermissionSnapshot[];
 }) {
-  const pathname = usePathname()
-  const { isMobile, state } = useSidebar()
-  const [hoveredItemHref, setHoveredItemHref] = React.useState<string | null>(null)
+  const pathname = usePathname();
+  const { isMobile, state } = useSidebar();
+  const [hoveredItemHref, setHoveredItemHref] = React.useState<string | null>(
+    null,
+  );
 
   const navigationGroups = React.useMemo(() => {
-    const groupedItems = new Map<string, NavigationItem[]>()
+    const groupedItems = new Map<string, NavigationItem[]>();
 
     for (const permission of permissions) {
       if (!permission.canView || !permission.path) {
-        continue
+        continue;
       }
 
-      const items = groupedItems.get(permission.groupName) ?? []
-      const visibleSubItems = (moduleSubItems[permission.key] ?? []).filter((subItem) =>
-        permissions.some(
-          (candidate) => candidate.canView && candidate.path === subItem.href
-        )
-      )
+      if (permission.key === "dashboard") {
+        continue;
+      }
+
+      const items = groupedItems.get(permission.groupName) ?? [];
+      const visibleSubItems =
+        permission.key === "orders"
+          ? (moduleSubItems[permission.key] ?? [])
+          : (moduleSubItems[permission.key] ?? []).filter((subItem) =>
+              permissions.some(
+                (candidate) =>
+                  candidate.canView && candidate.path === subItem.href,
+              ),
+            );
 
       items.push({
         key: permission.key,
@@ -119,31 +141,36 @@ export function AppSidebar({
         icon: iconMap[permission.key] ?? FolderKanbanIcon,
         hint: moduleHints[permission.key] ?? "Access",
         subItems: visibleSubItems.length ? visibleSubItems : undefined,
-      })
-      groupedItems.set(permission.groupName, items)
+      });
+      groupedItems.set(permission.groupName, items);
     }
 
     return Array.from(groupedItems.entries()).map(([label, items]) => ({
       label,
       items: items.sort((left, right) => {
-        const leftPermission = permissions.find((permission) => permission.key === left.key)
-        const rightPermission = permissions.find((permission) => permission.key === right.key)
+        const leftPermission = permissions.find(
+          (permission) => permission.key === left.key,
+        );
+        const rightPermission = permissions.find(
+          (permission) => permission.key === right.key,
+        );
 
         return (
-          (leftPermission?.sortOrder ?? 0) - (rightPermission?.sortOrder ?? 0) ||
+          (leftPermission?.sortOrder ?? 0) -
+            (rightPermission?.sortOrder ?? 0) ||
           left.title.localeCompare(right.title)
-        )
+        );
       }),
-    }))
-  }, [permissions])
+    }));
+  }, [permissions]);
 
   const expandedItem =
     navigationGroups
       .flatMap((group) => group.items)
-      .find((item) => item.href === hoveredItemHref) ?? null
+      .find((item) => item.href === hoveredItemHref) ?? null;
 
   const isExpandedPanelVisible =
-    !!expandedItem?.subItems?.length && !isMobile && state === "expanded"
+    !!expandedItem?.subItems?.length && !isMobile && state === "expanded";
 
   return (
     <Sidebar
@@ -189,7 +216,11 @@ export function AppSidebar({
                     <SidebarNavigationItem
                       key={item.key}
                       item={item}
-                      isActive={pathname === item.href || pathname.startsWith(`${item.href}/`)}
+                      pathname={pathname}
+                      isActive={
+                        pathname === item.href ||
+                        pathname.startsWith(`${item.href}/`)
+                      }
                       isExpanded={expandedItem?.key === item.key}
                       isMobile={isMobile}
                       onHover={() => setHoveredItemHref(item.href)}
@@ -213,13 +244,6 @@ export function AppSidebar({
 
               <div className="min-h-0 flex-1 overflow-y-auto p-3">
                 <div className="space-y-1">
-                  <Link
-                    href={expandedItem.href}
-                    className="flex rounded-2xl border border-transparent px-3 py-3 text-sm font-medium text-slate-700 transition-all duration-200 hover:border-white/55 hover:bg-white/40 hover:text-slate-950"
-                  >
-                    Overview
-                  </Link>
-
                   {expandedItem.subItems?.map((subItem) => (
                     <Link
                       key={subItem.href}
@@ -241,30 +265,40 @@ export function AppSidebar({
 
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
 
 function SidebarNavigationItem({
   item,
+  pathname,
   isActive,
   isExpanded,
   isMobile,
   onHover,
 }: {
-  item: NavigationItem
-  isActive: boolean
-  isExpanded: boolean
-  isMobile: boolean
-  onHover: () => void
+  item: NavigationItem;
+  pathname: string;
+  isActive: boolean;
+  isExpanded: boolean;
+  isMobile: boolean;
+  onHover: () => void;
 }) {
-  const Icon = item.icon
+  const Icon = item.icon;
+  const isItemActive =
+    pathname === item.href ||
+    pathname.startsWith(`${item.href}/`) ||
+    item.subItems?.some(
+      (subItem) =>
+        pathname === subItem.href || pathname.startsWith(`${subItem.href}/`),
+    ) ||
+    false;
 
   if (!item.subItems?.length || isMobile) {
     return (
       <SidebarMenuItem>
         <SidebarMenuButton
           asChild
-          isActive={isActive}
+          isActive={isActive || isItemActive}
           tooltip={item.title}
           className="h-11 rounded-2xl px-3 text-slate-600 transition-all duration-200 hover:bg-white/32 hover:text-slate-950 data-[active=true]:border data-[active=true]:border-white/50 data-[active=true]:bg-white/42 data-[active=true]:text-slate-950 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-2xl group-data-[collapsible=icon]:px-0"
         >
@@ -279,14 +313,14 @@ function SidebarNavigationItem({
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
-    )
+    );
   }
 
   return (
     <SidebarMenuItem onMouseEnter={onHover}>
       <SidebarMenuButton
         asChild
-        isActive={isActive || isExpanded}
+        isActive={isActive || isExpanded || isItemActive}
         tooltip={item.title}
         className="h-11 rounded-2xl px-3 text-slate-600 transition-all duration-200 hover:bg-white/32 hover:text-slate-950 data-[active=true]:border data-[active=true]:border-white/50 data-[active=true]:bg-white/42 data-[active=true]:text-slate-950 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-2xl group-data-[collapsible=icon]:px-0"
       >
@@ -306,5 +340,5 @@ function SidebarNavigationItem({
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
-  )
+  );
 }
