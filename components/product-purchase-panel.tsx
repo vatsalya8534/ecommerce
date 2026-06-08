@@ -23,6 +23,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
     startTransition(() => {
       addItem({
         productId: product.id,
+        product,
         color: selectedColor,
         size: selectedSize,
         quantity,
@@ -36,6 +37,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
     startTransition(() => {
       addItem({
         productId: product.id,
+        product,
         color: selectedColor,
         size: selectedSize,
         quantity,
@@ -55,6 +57,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
             id="color"
             value={selectedColor}
             onChange={(event) => setSelectedColor(event.target.value)}
+            suppressHydrationWarning
             className="mt-2 w-full rounded-2xl border border-[#d8dfcc] bg-white px-4 py-3 text-sm text-[#253116] outline-none transition focus:border-[#93a374]"
           >
             {product.colors.map((color) => (
@@ -73,6 +76,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
             id="size"
             value={selectedSize}
             onChange={(event) => setSelectedSize(event.target.value)}
+            suppressHydrationWarning
             className="mt-2 w-full rounded-2xl border border-[#d8dfcc] bg-white px-4 py-3 text-sm text-[#253116] outline-none transition focus:border-[#93a374]"
           >
             {product.sizes.map((size) => (
@@ -92,6 +96,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
           id="quantity"
           value={quantity}
           onChange={(event) => setQuantity(Number(event.target.value))}
+          suppressHydrationWarning
           className="mt-2 w-full rounded-2xl border border-[#d8dfcc] bg-white px-4 py-3 text-sm text-[#253116] outline-none transition focus:border-[#93a374]"
         >
           {Array.from({ length: 10 }).map((_, index) => (
@@ -107,6 +112,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
           type="button"
           onClick={handleAddToCart}
           disabled={isPending}
+          suppressHydrationWarning
           className="inline-flex items-center justify-center rounded-full border border-[#cad2bb] px-6 py-3 text-sm font-bold text-[#263118] transition hover:bg-[#f5f8ef] disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isPending ? "Adding..." : "Add to cart"}
@@ -115,6 +121,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
           type="button"
           onClick={handleBuyNow}
           disabled={isPending}
+          suppressHydrationWarning
           className="inline-flex items-center justify-center rounded-full bg-[#2f3b1d] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#243015]"
         >
           Buy now

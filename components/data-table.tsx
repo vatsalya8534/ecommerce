@@ -157,6 +157,7 @@ export function DataTable<TData, TValue>({
                       <button
                         type="button"
                         onClick={header.column.getToggleSortingHandler()}
+                        suppressHydrationWarning
                         className="flex w-full items-center gap-1.5 text-left text-white transition hover:text-white/90"
                       >
                         <span>{flexRender(header.column.columnDef.header, header.getContext())}</span>

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Minus, Plus, ShieldCheck, ShoppingBag, Trash2, Truck } from "lucide-react";
 import { useCart } from "@/components/use-cart";
 import { formatPrice } from "@/lib/format-price";
-import { productCatalog } from "@/lib/product-catalog";
 
 const protectPromiseFee = 19;
 
@@ -16,7 +15,7 @@ export function CartPage() {
 
   const detailedItems = cartItems
     .map((item) => {
-      const product = productCatalog.find((entry) => entry.id === item.productId);
+      const product = item.product;
       if (!product) {
         return null;
       }

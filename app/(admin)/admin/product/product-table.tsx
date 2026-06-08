@@ -183,7 +183,11 @@ function getProductColumns(canManage: boolean): ColumnDef<ProductAdminRecord>[] 
                   </Link>
                   <form action={deleteProductAction}>
                     <input type="hidden" name="id" value={product.id} />
-                    <button type="submit" className="rounded-full border border-rose-200 px-3 py-1.5 text-rose-600 transition hover:bg-rose-50 hover:text-rose-700">
+                    <button
+                      type="submit"
+                      suppressHydrationWarning
+                      className="rounded-full border border-rose-200 px-3 py-1.5 text-rose-600 transition hover:bg-rose-50 hover:text-rose-700"
+                    >
                       Delete
                     </button>
                   </form>

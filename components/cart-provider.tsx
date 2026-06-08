@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useSyncExternalStore } from "react";
-import { productCatalog } from "@/lib/product-catalog";
+import { createContext, useEffect, useSyncExternalStore } from "react";
+import type { ProductEntry } from "@/lib/product-catalog";
 
 const CART_STORAGE_KEY = "shophub-cart";
 const CART_EVENT = "shophub-cart-updated";
@@ -15,6 +15,12 @@ export type CartItem = {
   quantity: number;
   color: string;
   size: string;
+  product?: ProductEntry;
+};
+
+type CartProviderProps = {
+  children: React.ReactNode;
+  initialProducts: ProductEntry[];
 };
 
 type CartContextValue = {
@@ -23,7 +29,7 @@ type CartContextValue = {
   subtotal: number;
   discountTotal: number;
   total: number;
-  addItem: (input: { productId: string; quantity?: number; color?: string; size?: string }) => void;
+  addItem: (input: { productId: string; product?: ProductEntry; quantity?: number; color?: string; size?: string }) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -84,21 +90,57 @@ function subscribeToCartStore(onStoreChange: () => void) {
   };
 }
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({ children, initialProducts }: CartProviderProps) {
   const cartItems = useSyncExternalStore(
     subscribeToCartStore,
     readCartSnapshot,
     () => EMPTY_CART
   );
 
-  const addItem: CartContextValue["addItem"] = ({ productId, quantity = 1, color, size }) => {
-    const product = productCatalog.find((entry) => entry.id === productId);
-    if (!product) {
+  useEffect(() => {
+    const missingProductIds = Array.from(new Set(cartItems.filter((item) => !item.product).map((item) => item.productId)));
+
+    if (missingProductIds.length === 0) {
       return;
     }
 
-    const safeColor = color ?? product.colors[0] ?? "Standard";
-    const safeSize = size ?? product.sizes[0] ?? "Standard";
+    const productsById = new Map(
+      initialProducts.filter((product) => missingProductIds.includes(product.id)).map((product) => [product.id, product])
+    );
+
+    let hasUpdates = false;
+    const nextItems = cartItems.map((item) => {
+      if (item.product) {
+        return item;
+      }
+
+      const product = productsById.get(item.productId);
+      if (!product) {
+        return item;
+      }
+
+      hasUpdates = true;
+      return {
+        ...item,
+        product,
+      };
+    });
+
+    if (hasUpdates) {
+      writeCartSnapshot(nextItems);
+    }
+
+    return () => {};
+  }, [cartItems, initialProducts]);
+
+  const addItem: CartContextValue["addItem"] = ({ productId, product, quantity = 1, color, size }) => {
+    const resolvedProduct = product ?? initialProducts.find((entry) => entry.id === productId);
+    if (!resolvedProduct) {
+      return;
+    }
+
+    const safeColor = color ?? resolvedProduct.colors[0] ?? "Standard";
+    const safeSize = size ?? resolvedProduct.sizes[0] ?? "Standard";
     const itemId = createCartItemId(productId, safeColor, safeSize);
     const existingItem = cartItems.find((item) => item.id === itemId);
 
@@ -106,7 +148,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       writeCartSnapshot(
         cartItems.map((item) =>
           item.id === itemId
-            ? { ...item, quantity: Math.min(item.quantity + quantity, 10) }
+            ? { ...item, quantity: Math.min(item.quantity + quantity, 10), product: item.product ?? resolvedProduct }
             : item
         )
       );
@@ -121,6 +163,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         quantity: Math.min(quantity, 10),
         color: safeColor,
         size: safeSize,
+        product: resolvedProduct,
       },
     ]);
   };
@@ -146,11 +189,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = cartItems.reduce((sum, item) => {
-    const product = productCatalog.find((entry) => entry.id === item.productId);
+    const product = item.product;
     return sum + (product?.originalPriceValue ?? 0) * item.quantity;
   }, 0);
   const discountTotal = cartItems.reduce((sum, item) => {
-    const product = productCatalog.find((entry) => entry.id === item.productId);
+    const product = item.product;
     if (!product) {
       return sum;
     }

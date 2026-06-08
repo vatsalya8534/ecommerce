@@ -76,6 +76,7 @@ function revalidateCatalogPages() {
   revalidatePath("/admin/category")
   revalidatePath("/admin/category/new")
   revalidatePath("/admin/product")
+  revalidatePath("/products")
 }
 
 async function getUploadedImages(formData: FormData) {
@@ -407,11 +408,12 @@ export async function createProductAction(formData: FormData) {
 export async function updateProductAction(formData: FormData) {
   await requireModulePermission("products", "action")
 
+  const id = String(formData.get("id") ?? "")
+
   if (!hasDatabaseUrl || !prisma) {
     redirect(`/admin/product/new?edit=${id}&error=database`)
   }
 
-  const id = String(formData.get("id") ?? "")
   const categoryId = String(formData.get("categoryId") ?? "")
   const name = String(formData.get("name") ?? "").trim()
   const providedSlug = String(formData.get("slug") ?? "").trim()
@@ -602,11 +604,11 @@ export async function updateProductAction(formData: FormData) {
 export async function deleteProductAction(formData: FormData) {
   await requireModulePermission("products", "action")
 
+  const id = String(formData.get("id") ?? "")
+
   if (!hasDatabaseUrl || !prisma) {
     redirect(`/admin/product/new?edit=${id}&error=database`)
   }
-
-  const id = String(formData.get("id") ?? "")
 
   if (!id) {
     redirect("/admin/product?error=not-found")

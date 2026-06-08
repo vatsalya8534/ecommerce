@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Search, SlidersHorizontal, Star } from "lucide-react";
-import { categoryCatalog, getCategoryBySlug } from "@/lib/category-catalog";
+import { getPublicCategories, getPublicProducts } from "@/lib/catalog-admin";
 import { filterProducts } from "@/lib/product-catalog";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 
@@ -44,13 +44,17 @@ export async function ProductCatalog({
 }: ProductCatalogProps) {
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const activeCategorySlug = lockedCategorySlug ?? resolvedSearchParams.category ?? "";
-  const activeCategory = activeCategorySlug ? getCategoryBySlug(activeCategorySlug) : undefined;
-  const products = filterProducts({
-    category: activeCategorySlug || undefined,
-    q: resolvedSearchParams.q,
-    price: resolvedSearchParams.price,
-    sort: resolvedSearchParams.sort,
-  });
+  const [categories, publicProducts] = await Promise.all([getPublicCategories(), getPublicProducts()]);
+  const activeCategory = activeCategorySlug ? categories.find((category) => category.slug === activeCategorySlug) : undefined;
+  const products = filterProducts(
+    {
+      category: activeCategorySlug || undefined,
+      q: resolvedSearchParams.q,
+      price: resolvedSearchParams.price,
+      sort: resolvedSearchParams.sort,
+    },
+    publicProducts
+  );
 
   return (
     <section className="px-4 py-8 sm:px-6 lg:px-8">
@@ -85,7 +89,7 @@ export async function ProductCatalog({
                     className="mt-2 w-full rounded-2xl border border-[#d6dcc9] bg-[#f8faf3] px-4 py-3 text-sm text-[#263118] outline-none transition focus:border-[#93a374]"
                   >
                     <option value="">All categories</option>
-                    {categoryCatalog.map((category) => (
+                    {categories.map((category) => (
                       <option key={category.slug} value={category.slug}>
                         {category.name}
                       </option>

@@ -16,7 +16,7 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
 
   function handleClick() {
     startTransition(() => {
-      addItem({ productId: product.id });
+      addItem({ productId: product.id, product });
       setLabel("Added");
       window.setTimeout(() => setLabel("Add to cart"), 1600);
     });

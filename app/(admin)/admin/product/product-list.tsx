@@ -56,6 +56,7 @@ export function ProductList({
               <CollapsibleTrigger asChild>
                 <button
                   type="button"
+                  suppressHydrationWarning
                   className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-white/35"
                 >
                   <div className="min-w-0">
@@ -170,7 +171,11 @@ export function ProductList({
                     {canManage ? (
                       <form action={deleteProductAction}>
                         <input type="hidden" name="id" value={product.id} />
-                        <button type="submit" className="text-sm font-medium text-rose-600 hover:text-rose-700">
+                        <button
+                          type="submit"
+                          suppressHydrationWarning
+                          className="text-sm font-medium text-rose-600 hover:text-rose-700"
+                        >
                           Delete
                         </button>
                       </form>

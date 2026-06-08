@@ -87,6 +87,7 @@ export function HeroCarousel() {
               alt={activeSlide.imageAlt}
               fill
               preload={activeIndex === 0}
+              loading={activeIndex === 0 ? "eager" : "lazy"}
               sizes="100vw"
               className="object-cover"
             />
