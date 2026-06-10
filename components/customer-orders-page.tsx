@@ -17,6 +17,9 @@ export function CustomerOrdersPage({ user }: { user: AuthUser }) {
             <h1 className="mt-2 text-4xl font-black tracking-tight text-[#1b2511]">
               Your order history
             </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-7 text-[#647159]">
+              Click any order in the table to open its full details on a dedicated page.
+            </p>
           </div>
 
           <Link

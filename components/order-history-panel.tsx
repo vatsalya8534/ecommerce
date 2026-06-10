@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowUpRight, ShoppingBag } from "lucide-react";
+import { useSyncExternalStore } from "react";
 
 import { DataTable } from "@/components/data-table";
 import type { AuthUser } from "@/lib/auth-types";
@@ -21,6 +22,7 @@ const statusStyles: Record<StoredOrder["status"], string> = {
 type OrderTableRow = {
   id: string;
   orderId: string;
+  order: StoredOrder;
   status: StoredOrder["status"];
   placedAt: string;
   firstItemName: string;
@@ -35,6 +37,7 @@ type OrderHistoryPanelProps = {
 };
 
 export function OrderHistoryPanel({ user }: OrderHistoryPanelProps) {
+  const router = useRouter();
   const orders = useSyncExternalStore(
     subscribeToStoredOrders,
     () => readStoredOrdersForCustomer(user.email),
@@ -49,6 +52,7 @@ export function OrderHistoryPanel({ user }: OrderHistoryPanelProps) {
         return {
           id: order.id,
           orderId: order.id,
+          order,
           status: order.status,
           placedAt: order.placedAt,
           firstItemName: firstItem?.name ?? "Order",
@@ -98,6 +102,7 @@ export function OrderHistoryPanel({ user }: OrderHistoryPanelProps) {
     <section className="overflow-hidden rounded-[1.75rem] border border-[#dce5d0] bg-white shadow-[0_24px_60px_-50px_rgba(35,45,24,0.5)]">
       <DataTable
         data={orderRows}
+        onRowClick={(row) => router.push(`/account/orders/${row.order.id}`)}
         columns={[
           {
             accessorKey: "orderId",
@@ -109,12 +114,7 @@ export function OrderHistoryPanel({ user }: OrderHistoryPanelProps) {
                 <div>
                   <p className="text-sm font-semibold text-[#1b2511]">{item.orderId}</p>
                   <p className="mt-1 text-xs text-[#667156]">
-                    Placed on{" "}
-                    {new Date(item.placedAt).toLocaleDateString("en-IN", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                    Placed on {formatOrderDate(item.placedAt)}
                   </p>
                 </div>
               );
@@ -168,19 +168,20 @@ export function OrderHistoryPanel({ user }: OrderHistoryPanelProps) {
             id: "actions",
             header: "Actions",
             enableHiding: false,
-            cell: () => (
+            cell: ({ row }) => (
               <Link
-                href="/track-order"
+                href={`/account/orders/${row.original.order.id}`}
+                onClick={(event) => event.stopPropagation()}
                 className="inline-flex items-center gap-2 rounded-full border border-[#d7e0cb] bg-[#f8faf5] px-4 py-2 text-sm font-semibold text-[#425136] transition hover:bg-[#eef4e7]"
               >
-                Track
+                View details
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
             ),
           },
         ]}
         title="Recent orders"
-        description="Review your placed orders in a compact table with order id, status, payment, destination, and total."
+        description="Review your placed orders in a compact table with order id, status, payment, destination, and total. Click an order to open its full detail page."
         searchKey="firstItemName"
         searchPlaceholder="Search orders..."
         emptyMessage="No orders found."
@@ -188,6 +189,14 @@ export function OrderHistoryPanel({ user }: OrderHistoryPanelProps) {
       />
     </section>
   );
+}
+
+function formatOrderDate(placedAt: string) {
+  return new Date(placedAt).toLocaleDateString("en-IN", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 function getPaymentMethodLabel(paymentMethod: StoredOrder["paymentMethod"]) {

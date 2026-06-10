@@ -55,6 +55,7 @@ type DataTableProps<TData, TValue> = {
   emptyMessage?: string
   columnVisibilityLabel?: string
   enablePagination?: boolean
+  onRowClick?: (row: TData) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -68,6 +69,7 @@ export function DataTable<TData, TValue>({
   emptyMessage = "No results found.",
   columnVisibilityLabel = "Columns",
   enablePagination = true,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -185,9 +187,22 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  role={onRowClick ? "button" : undefined}
+                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            onRowClick(row.original);
+                          }
+                        }
+                      : undefined
+                  }
                   className={`border-b border-slate-100/80 transition hover:bg-sky-50/50 ${
                     row.index % 2 === 0 ? "bg-white" : "bg-slate-50/40"
-                  }`}
+                  } ${onRowClick ? "cursor-pointer focus:outline-none focus-visible:bg-sky-50/70" : ""}`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="align-middle px-4 py-4 first:pl-6 last:pr-6">
